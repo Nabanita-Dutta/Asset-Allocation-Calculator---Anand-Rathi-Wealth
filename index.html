@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Allocation Calculator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            position: relative; 
+        }
+        .logo { 
+            position: absolute; 
+            top: 10px; 
+            right: 20px; 
+            width: 200px; /* Adjust the size as needed */
+        }
+        input { 
+            width: 150px; 
+            padding: 5px; 
+            margin: 5px; 
+        }
+        button { 
+            padding: 10px 20px; 
+            margin-top: 10px; 
+            font-weight: bold; 
+        }
+        table { 
+            width: 50%; 
+            margin: 20px auto; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            border: 1px solid black; 
+            padding: 10px; 
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+    <!-- Anand Rathi Logo -->
+    <img src="image.png" alt="Anand Rathi Logo" class="logo">
+
+    <h2>Asset Allocation Calculator</h2>
+    <p>Enter your investments in each asset class:</p>
+    
+    <label>Equity (₹): <input type="number" id="equity"></label><br>
+    <label>Debt (₹): <input type="number" id="debt"></label><br>
+    <label>Gold (₹): <input type="number" id="gold"></label><br>
+    <label>Real Estate (₹): <input type="number" id="realEstate"></label><br>
+    <label>Other (₹): <input type="number" id="other"></label><br>
+
+    <button onclick="calculateAllocation()">Calculate</button>
+
+    <h3>Portfolio Allocation:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Asset Class</th>
+                <th>Investment (₹)</th>
+                <th>Allocation (%)</th>
+            </tr>
+        </thead>
+        <tbody id="resultTable"></tbody>
+    </table>
+
+    <script>
+        function calculateAllocation() {
+            let equity = parseFloat(document.getElementById("equity").value) || 0;
+            let debt = parseFloat(document.getElementById("debt").value) || 0;
+            let gold = parseFloat(document.getElementById("gold").value) || 0;
+            let realEstate = parseFloat(document.getElementById("realEstate").value) || 0;
+            let other = parseFloat(document.getElementById("other").value) || 0;
+
+            let total = equity + debt + gold + realEstate + other;
+
+            if (total === 0) {
+                alert("Please enter at least one investment amount.");
+                return;
+            }
+
+            let allocations = [
+                { name: "Equity", value: equity },
+                { name: "Debt", value: debt },
+                { name: "Gold", value: gold },
+                { name: "Real Estate", value: realEstate },
+                { name: "Other", value: other }
+            ];
+
+            let resultHTML = "";
+            allocations.forEach(asset => {
+                let percentage = ((asset.value / total) * 100).toFixed(2);
+                resultHTML += `<tr>
+                    <td>${asset.name}</td>
+                    <td>₹${asset.value.toLocaleString()}</td>
+                    <td>${percentage}%</td>
+                </tr>`;
+            });
+
+            document.getElementById("resultTable").innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
