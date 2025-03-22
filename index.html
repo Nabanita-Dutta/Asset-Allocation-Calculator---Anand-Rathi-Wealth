@@ -3,106 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asset Allocation Calculator</title>
+    <title>Know your SIP</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 20px; 
-            position: relative; 
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .logo { 
-            position: absolute; 
-            top: 10px; 
-            right: 20px; 
-            width: 180px; /* Adjust the size as needed */
+        .calculator {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            position: relative;
         }
-        input { 
-            width: 150px; 
-            padding: 5px; 
-            margin: 5px; 
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
         }
-        button { 
-            padding: 10px 20px; 
-            margin-top: 10px; 
-            font-weight: bold; 
+        h2 {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 20px;
         }
-        table { 
-            width: 50%; 
-            margin: 20px auto; 
-            border-collapse: collapse; 
+        input, button, .output, label {
+            width: 100%;
+            margin-bottom: 15px;
         }
-        th, td { 
-            border: 1px solid black; 
-            padding: 10px; 
-            text-align: center; 
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        @media(max-width: 500px) {
+            .logo {
+                width: 40px;
+                top: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Anand Rathi Logo -->
-    <img src="image.png" alt="Anand Rathi Logo" class="logo">
+    <div class="calculator">
+        <img src="Logo.png" alt="Logo" class="logo">
+        <h2>Know your SIP</h2>
+        <div class="error" id="error"></div>
+        <label>Corpus already accumulated (Rs. in Lakhs):</label>
+        <input type="number" id="corpus">
 
-    <!-- Additional Row Before Header -->
-    <h5> .                                        . </h5>
-    
-    <h2>Asset Allocation Calculator</h2>
-    <p>Enter your investments in each asset class:</p>
-    
-    <label>Equity (₹): <input type="number" id="equity"></label><br>
-    <label>Debt (₹): <input type="number" id="debt"></label><br>
-    <label>Gold (₹): <input type="number" id="gold"></label><br>
-    <label>Real Estate (₹): <input type="number" id="realEstate"></label><br>
-    <label>Other (₹): <input type="number" id="other"></label><br>
+        <label>Yearly Step up rate of SIP (%):</label>
+        <input type="number" id="stepup">
 
-    <button onclick="calculateAllocation()">Calculate</button>
+        <label>Expected Rate of Return (%): <span id="rateValue">10</span>%</label>
+        <input type="range" id="rate" min="5" max="20" value="10" step="0.1" onchange="updateRate()">
 
-    <h3>Portfolio Allocation:</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Asset Class</th>
-                <th>Investment (₹)</th>
-                <th>Allocation (%)</th>
-            </tr>
-        </thead>
-        <tbody id="resultTable"></tbody>
-    </table>
+        <label>Enter your Goal Amount (Rs. in Crores):</label>
+        <input type="number" id="goal">
+
+        <label>Expected time of Goal completion (in years):</label>
+        <input type="number" id="years">
+
+        <button onclick="calculateSIP()">Calculate Monthly SIP Required</button>
+
+        <div class="output" id="result"></div>
+    </div>
 
     <script>
-        function calculateAllocation() {
-            let equity = parseFloat(document.getElementById("equity").value) || 0;
-            let debt = parseFloat(document.getElementById("debt").value) || 0;
-            let gold = parseFloat(document.getElementById("gold").value) || 0;
-            let realEstate = parseFloat(document.getElementById("realEstate").value) || 0;
-            let other = parseFloat(document.getElementById("other").value) || 0;
+        function updateRate() {
+            document.getElementById('rateValue').innerText = document.getElementById('rate').value;
+        }
 
-            let total = equity + debt + gold + realEstate + other;
+        function calculateSIP() {
+            const corpus = parseFloat(document.getElementById('corpus').value);
+            const stepup = parseFloat(document.getElementById('stepup').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const goal = parseFloat(document.getElementById('goal').value);
+            const years = parseFloat(document.getElementById('years').value);
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
 
-            if (total === 0) {
-                alert("Please enter at least one investment amount.");
+            if (isNaN(corpus) || isNaN(stepup) || isNaN(rate) || isNaN(goal) || isNaN(years)) {
+                errorDiv.innerText = 'All fields are mandatory!';
                 return;
             }
 
-            let allocations = [
-                { name: "Equity", value: equity },
-                { name: "Debt", value: debt },
-                { name: "Gold", value: gold },
-                { name: "Real Estate", value: realEstate },
-                { name: "Other", value: other }
-            ];
+            errorDiv.innerText = '';
 
-            let resultHTML = "";
-            allocations.forEach(asset => {
-                let percentage = ((asset.value / total) * 100).toFixed(2);
-                resultHTML += `<tr>
-                    <td>${asset.name}</td>
-                    <td>₹${asset.value.toLocaleString()}</td>
-                    <td>${percentage}%</td>
-                </tr>`;
-            });
+            const monthlyRate = rate / 12 / 100;
+            const months = years * 12;
+            const futureValueGoal = goal * 10000000 - (corpus * 100000); 
 
-            document.getElementById("resultTable").innerHTML = resultHTML;
+            let monthlySIP = futureValueGoal * monthlyRate / (Math.pow(1 + monthlyRate, months) - 1);
+
+            const totalInvestment = (monthlySIP * months) / 10000000;
+            const excessGain = ((goal * 10000000) - (monthlySIP * months + corpus * 100000)) / 100000;
+
+            resultDiv.innerHTML = `<strong>Monthly SIP Required:</strong> ₹${monthlySIP.toFixed(0)} <br>
+                <strong>Total Investment:</strong> ₹${totalInvestment.toFixed(2)} Cr <br>
+                <strong>Total Target Value:</strong> ₹${goal.toFixed(2)} Cr <br>
+                <strong>Excess gain:</strong> ₹${excessGain.toFixed(2)} Lakhs`;
         }
     </script>
 </body>
